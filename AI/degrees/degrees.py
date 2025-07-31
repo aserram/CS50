@@ -91,9 +91,34 @@ def shortest_path(source, target):
 
     If no possible path, returns None.
     """
+    start = Node(source, parent=None, action=None)
+    frontier = QueueFrontier()
+    frontier.add(start)
 
-    # TODO
-    raise NotImplementedError
+    explored = set()
+
+    while True:
+        if frontier.empty():
+            raise Exception("no solution")
+
+        node = frontier.remove()
+
+        if node.state == target:
+            path = []
+
+            while node.parent is not None:
+                movie_actor = (node.action, node.state)
+                path.append(movie_actor)
+                node = node.parent
+            path.reverse()
+            return path
+
+        explored.add(node.state)
+
+        for action, state in neighbors_for_person(node.state):
+            if not frontier.contains_state(state) and state not in explored:
+                child = Node(state, node, action)
+                frontier.add(child)
 
 
 def person_id_for_name(name):
