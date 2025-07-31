@@ -21,11 +21,7 @@ def load_data(directory):
     with open(f"{directory}/people.csv", encoding="utf-8") as f:
         reader = csv.DictReader(f)
         for row in reader:
-            people[row["id"]] = {
-                "name": row["name"],
-                "birth": row["birth"],
-                "movies": set()
-            }
+            people[row["id"]] = {"name": row["name"], "birth": row["birth"], "movies": set()}
             if row["name"].lower() not in names:
                 names[row["name"].lower()] = {row["id"]}
             else:
@@ -35,11 +31,7 @@ def load_data(directory):
     with open(f"{directory}/movies.csv", encoding="utf-8") as f:
         reader = csv.DictReader(f)
         for row in reader:
-            movies[row["id"]] = {
-                "title": row["title"],
-                "year": row["year"],
-                "stars": set()
-            }
+            movies[row["id"]] = {"title": row["title"], "year": row["year"], "stars": set()}
 
     # Load stars
     with open(f"{directory}/stars.csv", encoding="utf-8") as f:
@@ -99,7 +91,7 @@ def shortest_path(source, target):
 
     while True:
         if frontier.empty():
-            raise Exception("no solution")
+            return None
 
         node = frontier.remove()
 
