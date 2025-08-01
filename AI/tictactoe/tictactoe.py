@@ -41,6 +41,12 @@ def actions(board):
 
 def result(board, action):
     result_board = deepcopy(board)
+
+    if result_board[action[0]][action[1]] is not EMPTY:
+        raise Exception("Invalid move action")
+    if action[0] not in [0, 1, 2] or action[1] not in [0, 1, 2]:
+        raise Exception("Invalid move action out of bounds")
+
     result_board[action[0]][action[1]] = player(board)
     return result_board
 
@@ -116,5 +122,8 @@ def min_value(board, idx):
 
 
 def minimax(board):
-    min_value(board, 0)
-    return MINIMAX_ACT
+    if terminal(board):
+        return None
+    else:
+        min_value(board, 0)
+        return MINIMAX_ACT
