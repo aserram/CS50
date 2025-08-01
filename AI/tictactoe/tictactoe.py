@@ -45,10 +45,25 @@ def result(board, action):
 
 
 def winner(board):
-    """
-    Returns the winner of the game, if there is one.
-    """
-    raise NotImplementedError
+    players = (X, O)
+    for player in players:
+        # Check rows
+        for row in board:
+            if all(cell == player for cell in row):
+                return player
+
+        # Check columns
+        for col in range(3):
+            if board[0][col] == player and board[1][col] == player and board[2][col] == player:
+                return player
+
+        # Check diagonals
+        if board[0][0] == player and board[1][1] == player and board[2][2] == player:
+            return player
+        if board[0][2] == player and board[1][1] == player and board[2][0] == player:
+            return player
+
+    return None
 
 
 def terminal(board):
