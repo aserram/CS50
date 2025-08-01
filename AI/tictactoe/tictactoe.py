@@ -8,14 +8,14 @@ from copy import deepcopy
 X = "X"
 O = "O"
 EMPTY = None
+MINIMAX_ACT = (0, 0)
 
 
 def initial_state():
     """
     Returns starting state of the board.
     """
-    # return [[EMPTY, EMPTY, EMPTY], [EMPTY, EMPTY, EMPTY], [EMPTY, EMPTY, EMPTY]]
-    return [[O, X, X], [EMPTY, O, O], [EMPTY, X, X]]
+    return [[EMPTY, EMPTY, EMPTY], [EMPTY, EMPTY, EMPTY], [EMPTY, EMPTY, EMPTY]]
 
 
 def player(board):
@@ -87,28 +87,34 @@ def utility(board):
         return 0
 
 
-def max_value(board):
+def max_value(board, idx):
     if terminal(board):
         return utility(board)
 
-    v = -5
+    max_v = -5
     for action in actions(board):
-        v = max(v, min_value(result(board, action)))
-    return v
+        v = min_value(result(board, action), idx + 1)
+        if idx == 0 and v > max_v:
+            global MINIMAX_ACT
+            MINIMAX_ACT = action
+        max_v = max(v, max_v)
+    return max_v
 
 
-def min_value(board):
+def min_value(board, idx):
     if terminal(board):
         return utility(board)
 
-    v = 5
+    min_v = 5
     for action in actions(board):
-        v = min(v, max_value(result(board, action)))
-    return v
+        v = max_value(result(board, action), idx + 1)
+        if idx == 0 and v < min_v:
+            global MINIMAX_ACT
+            MINIMAX_ACT = action
+        min_v = min(v, min_v)
+    return min_v
 
 
 def minimax(board):
-    if player(board) == X:
-        max_value(board)
-    else:
-        min_value(board)
+    min_value(board, 0)
+    return MINIMAX_ACT
