@@ -40,7 +40,7 @@ def actions(board):
 
 def result(board, action):
     result_board = deepcopy(board)
-    result_board[action[0][action[1]]] = player(board)
+    result_board[action[0]][action[1]] = player(board)
     return result_board
 
 
