@@ -31,11 +31,11 @@ def player(board):
 
 
 def actions(board):
-    moves = []
+    moves = set()
     for row_idx in range(len(board)):
         for col_idx in range(len(board[row_idx])):
             if board[row_idx][col_idx] == EMPTY:
-                moves.append((row_idx, col_idx))
+                moves.add((row_idx, col_idx))
     return moves
 
 
