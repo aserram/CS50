@@ -3,6 +3,7 @@ Tic Tac Toe Player
 """
 
 import math
+from copy import deepcopy
 
 X = "X"
 O = "O"
@@ -24,9 +25,7 @@ def player(board):
         o_player += states.count(O)
     if x_player > o_player:
         return O
-    if x_player < o_player:
-        return X
-    else:
+    if x_player <= o_player:
         return X
 
 
@@ -40,10 +39,9 @@ def actions(board):
 
 
 def result(board, action):
-    """
-    Returns the board that results from making move (i, j) on the board.
-    """
-    raise NotImplementedError
+    result_board = deepcopy(board)
+    result_board[action[0][action[1]]] = player(board)
+    return result_board
 
 
 def winner(board):
