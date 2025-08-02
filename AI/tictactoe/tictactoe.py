@@ -124,6 +124,9 @@ def min_value(board, idx):
 def minimax(board):
     if terminal(board):
         return None
+
+    if player(board) == X:
+        max_value(board, 0)
     else:
         min_value(board, 0)
-        return MINIMAX_ACT
+    return MINIMAX_ACT
