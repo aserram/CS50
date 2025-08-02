@@ -95,15 +95,15 @@ def utility(board):
 
 def max_value(board, idx):
     if terminal(board):
-        score = utility(board)
+        score = 100 * utility(board)
         if score < 0:
-            return score + (0.1 * idx)
+            return score + idx
         elif score > 0:
-            return score - (0.1 * idx)
+            return score - idx
         else:
             return score
 
-    max_v = -5
+    max_v = -999
     for action in actions(board):
         v = min_value(result(board, action), idx + 1)
         if idx == 0 and v > max_v:
@@ -115,15 +115,15 @@ def max_value(board, idx):
 
 def min_value(board, idx):
     if terminal(board):
-        score = utility(board)
+        score = 100 * utility(board)
         if score < 0:
-            return score + (0.1 * idx)
+            return score + idx
         elif score > 0:
-            return score - (0.1 * idx)
+            return score - idx
         else:
             return score
 
-    min_v = 5
+    min_v = 999
     for action in actions(board):
         v = max_value(result(board, action), idx + 1)
         if idx == 0 and v < min_v:
