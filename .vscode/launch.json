@@ -9,6 +9,8 @@
             "type": "debugpy",
             "request": "launch",
             "program": "${file}",
+            // "cwd": "${workspaceFolder}\\AI\\tictactoe",
+            // "args": ["large"],
             "purpose": ["debug-test"],
             "console": "integratedTerminal",
             "env": {"PYTEST_ADDOPTS": "--no-cov"},
