@@ -1,6 +1,11 @@
-#Course datasets
-AI/degrees/small/
-AI/degrees/large/
+# CS50 Course support files
+# Ignore everything in the AI directory recursively
+AI/**
+# Allow all directories inside AI
+!AI/**/
+# Allow all .py files inside AI
+!AI/**/*.py
+
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
