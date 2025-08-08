@@ -64,10 +64,14 @@ knowledge3 = And(
     Not(And(CKnight, CKnave)),
 
     Implication(AKnight, Or(AKnight, AKnave)),
-    Implication(AKnave, Not(Or(AKnight, AKnave))),
+    # Commented below is replaced with De Morgan's Law
+    # Implication(AKnight, Not(Or(AKnight, AKnave))),
+    Implication(AKnave, And(AKnight, AKnave)),
 
-    Implication(BKnight, Implication(AKnight, BKnave)),
-    Implication(BKnave, Implication(AKnave, Not(BKnave))),
+    Implication(BKnight, Implication(AKnight, AKnave)),
+    # Commented below is replaced with inference rules
+    # Implication(BKnave, Not(Implication(AKnight, AKnave))),
+    Implication(BKnave, AKnight),
 
     Implication(BKnight, CKnave),
     Implication(BKnave, CKnight),
