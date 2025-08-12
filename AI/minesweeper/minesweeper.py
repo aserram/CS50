@@ -190,7 +190,7 @@ class MinesweeperAI:
 
     def infer_safe_and_mines(self):
         # Discover and mark cells as safe or mines based on new knowledge
-        discovered_mines = set()
+        discovered_mines = self.mines
         for sentence in self.knowledge:
             discovered_mines = discovered_mines.union(sentence.known_mines())
 
@@ -270,13 +270,13 @@ class MinesweeperAI:
             1) have not already been chosen, and
             2) are not known to be mines
         """
-        random_moves = set()
+        random_moves = []
         for i in range(self.height):
             for j in range(self.width):
                 if (i, j) not in self.moves_made and (i, j) not in self.mines:
-                    random_moves.add((i, j))
+                    random_moves.append((i, j))
 
         if random_moves:
-            return random_moves.pop()
+            return random.choice(random_moves)
         else:
             return None
