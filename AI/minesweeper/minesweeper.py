@@ -183,27 +183,26 @@ class MinesweeperAI:
 
                 # Update count if cell in bounds and is undiscovered
                 if 0 <= i < self.height and 0 <= j < self.width:
-                    if (i, j) not in self.moves_made and (i, j) not in self.mines and (i, j) not in self.safes:
+                    if (i, j) not in self.moves_made and (i, j) not in self.safes:
                         unknown_cells.add((i, j))
 
         return unknown_cells
 
     def infer_safe_and_mines(self):
         # Discover and mark cells as safe or mines based on new knowledge
-        discovered_safe = set()
-
-        for sentence in self.knowledge:
-            discovered_safe = discovered_safe.union(sentence.known_safes())
-
-        for safe_cell in discovered_safe:
-            self.mark_safe(safe_cell)
-
         discovered_mines = set()
         for sentence in self.knowledge:
             discovered_mines = discovered_mines.union(sentence.known_mines())
 
         for mine_cell in discovered_mines:
             self.mark_mine(mine_cell)
+
+        discovered_safe = set()
+        for sentence in self.knowledge:
+            discovered_safe = discovered_safe.union(sentence.known_safes())
+
+        for safe_cell in discovered_safe:
+            self.mark_safe(safe_cell)
 
     def add_knowledge(self, cell, count):
         """
