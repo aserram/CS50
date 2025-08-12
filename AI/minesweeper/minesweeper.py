@@ -113,12 +113,12 @@ class Sentence:
 
     def mark_mine(self, cell):
         if cell in self.cells:
-            self.cells -= cell
+            self.cells.remove(cell)
             self.count -= 1
 
     def mark_safe(self, cell):
         if cell in self.cells:
-            self.cells -= cell
+            self.cells.remove(cell)
 
 
 class MinesweeperAI:
@@ -160,6 +160,31 @@ class MinesweeperAI:
         for sentence in self.knowledge:
             sentence.mark_safe(cell)
 
+    def unknown_cells(self, cell):
+        """
+        Returns the nearby set of cells
+        within one row and column of a given cell,
+        not including the cell itself.
+        """
+
+        # Keep count of nearby cells
+        unknown_cells = set()
+
+        # Loop over all cells within one row and column
+        for i in range(cell[0] - 1, cell[0] + 2):
+            for j in range(cell[1] - 1, cell[1] + 2):
+
+                # Ignore the cell itself
+                if (i, j) == cell:
+                    continue
+
+                # Update count if cell in bounds and is undiscovered
+                if 0 <= i < self.height and 0 <= j < self.width:
+                    if (i, j) not in self.moves_made and (i, j) not in self.mines and (i, j) not in self.safes:
+                        unknown_cells.add((i, j))
+
+        return unknown_cells
+
     def add_knowledge(self, cell, count):
         """
         Called when the Minesweeper board tells us, for a given
@@ -175,7 +200,29 @@ class MinesweeperAI:
             5) add any new sentences to the AI's knowledge base
                if they can be inferred from existing knowledge
         """
-        raise NotImplementedError
+
+        # Mark cell as move made
+        self.moves_made.add(cell)
+
+        # Add new sentence to knowledge base
+        if self.unknown_cells(cell):
+            self.knowledge.append(Sentence(self.unknown_cells(cell), count))
+
+            # After knowledge added, mark cell as safe in sentences
+            self.mark_safe(cell)
+
+        # Discover and mark cells as safe or mines based on new knowledge
+        discovered_safe = set()
+        discovered_mines = set()
+        for sentence in self.knowledge:
+            discovered_safe = discovered_safe.union(sentence.known_safes())
+            discovered_mines = discovered_mines.union(sentence.known_mines())
+
+        for safe_cell in discovered_safe:
+            self.mark_safe(safe_cell)
+
+        for mine_cell in discovered_mines:
+            self.mark_mine(mine_cell)
 
     def make_safe_move(self):
         """
