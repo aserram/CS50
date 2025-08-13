@@ -192,14 +192,16 @@ class MinesweeperAI:
         # Discover and mark cells as safe or mines based on new knowledge
         discovered_mines = self.mines
         for sentence in self.knowledge:
-            discovered_mines = discovered_mines.union(sentence.known_mines())
+            if sentence.cells:
+                discovered_mines = discovered_mines.union(sentence.known_mines())
 
         for mine_cell in discovered_mines:
             self.mark_mine(mine_cell)
 
         discovered_safe = set()
         for sentence in self.knowledge:
-            discovered_safe = discovered_safe.union(sentence.known_safes())
+            if sentence.cells:
+                discovered_safe = discovered_safe.union(sentence.known_safes())
 
         for safe_cell in discovered_safe:
             self.mark_safe(safe_cell)
@@ -230,24 +232,27 @@ class MinesweeperAI:
         if self.unknown_cells(cell):
             self.knowledge.append(Sentence(self.unknown_cells(cell), count))
 
-        self.infer_safe_and_mines()
+            self.infer_safe_and_mines()
 
-        # Clean knowledge by removing empty sentences and sorting by set lengths
-        self.knowledge[:] = [x for x in self.knowledge if x]
-        self.knowledge.sort(key=len, reverse=True)
+            # Sort knowledge by set lengths
+            self.knowledge.sort(key=len, reverse=True)
 
-        # Infere sentences using the subset method
-        for set1 in range(len(self.knowledge) - 1):
-            for set2 in range(set1 + 1, len(self.knowledge)):
-                if self.knowledge[set2].cells < self.knowledge[set1].cells:
-                    self.knowledge.append(
-                        Sentence(
-                            self.knowledge[set1].cells - self.knowledge[set2].cells,
-                            self.knowledge[set1].count - self.knowledge[set2].count,
+            # Infere sentences using the subset method
+            for set1 in range(len(self.knowledge) - 1):
+                for set2 in range(set1 + 1, len(self.knowledge)):
+                    if (
+                        self.knowledge[set2].cells
+                        and self.knowledge[set1].cells
+                        and self.knowledge[set2].cells < self.knowledge[set1].cells
+                    ):
+                        self.knowledge.append(
+                            Sentence(
+                                self.knowledge[set1].cells - self.knowledge[set2].cells,
+                                self.knowledge[set1].count - self.knowledge[set2].count,
+                            )
                         )
-                    )
 
-        self.infer_safe_and_mines()
+            self.infer_safe_and_mines()
 
     def make_safe_move(self):
         """
