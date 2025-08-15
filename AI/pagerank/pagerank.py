@@ -40,10 +40,7 @@ def crawl(directory):
 
     # Only include links to other pages in the corpus
     for filename in pages:
-        pages[filename] = set(
-            link for link in pages[filename]
-            if link in pages
-        )
+        pages[filename] = set(link for link in pages[filename] if link in pages)
 
     return pages
 
@@ -83,7 +80,16 @@ def sample_pagerank(corpus, damping_factor, n):
     their estimated PageRank value (a value between 0 and 1). All
     PageRank values should sum to 1.
     """
-    raise NotImplementedError
+    current_page = random.choice(list(corpus.keys()))
+    samples = {page: 0 for page in corpus.keys()}
+
+    for _ in range(n):
+        model = transition_model(corpus, current_page, damping_factor)
+        current_page = random.choices(list(model.keys()), list(model.values())).pop()
+        samples[current_page] += 1
+
+    samples = {k: v / n for k, v in samples.items()}
+    return samples
 
 
 def iterate_pagerank(corpus, damping_factor):
