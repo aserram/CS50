@@ -81,15 +81,15 @@ def sample_pagerank(corpus, damping_factor, n):
     PageRank values should sum to 1.
     """
     current_page = random.choice(list(corpus.keys()))
-    samples = {page: 0 for page in corpus.keys()}
+    pr = {page: 0 for page in corpus.keys()}
 
     for _ in range(n):
         model = transition_model(corpus, current_page, damping_factor)
         current_page = random.choices(list(model.keys()), list(model.values())).pop()
-        samples[current_page] += 1
+        pr[current_page] += 1
 
-    samples = {k: v / n for k, v in samples.items()}
-    return samples
+    pr = {k: v / n for k, v in pr.items()}
+    return pr
 
 
 def iterate_pagerank(corpus, damping_factor):
@@ -101,7 +101,24 @@ def iterate_pagerank(corpus, damping_factor):
     their estimated PageRank value (a value between 0 and 1). All
     PageRank values should sum to 1.
     """
-    raise NotImplementedError
+    prev_pr = {page: 1 / len(corpus) for page in corpus.keys()}
+    next_pr = {page: 0 for page in corpus.keys()}
+    not_converged = True
+
+    while not_converged:
+        for page_p in corpus.keys():
+            prob_p = 0
+            for page_i, links_i in corpus.items():
+                if page_p != page_i and page_p in links_i:
+                    prob_p += damping_factor * prev_pr[page_i] / len(links_i)
+
+            next_pr[page_p] = ((1 - damping_factor) / len(corpus)) + prob_p
+
+        for pr_prev, pr_next in zip(prev_pr.values(), next_pr.values()):
+            not_converged = not_converged & (abs(pr_prev - pr_next) > 0.001)
+
+        prev_pr = dict(next_pr)
+    return next_pr
 
 
 if __name__ == "__main__":
