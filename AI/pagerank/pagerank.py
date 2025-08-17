@@ -109,8 +109,10 @@ def iterate_pagerank(corpus, damping_factor):
         for page_p in corpus.keys():
             prob_p = 0
             for page_i, links_i in corpus.items():
-                if page_p != page_i and page_p in links_i:
+                if page_p in links_i:
                     prob_p += damping_factor * prev_pr[page_i] / len(links_i)
+                elif not links_i:
+                    prob_p += damping_factor * prev_pr[page_i] / len(corpus)
 
             next_pr[page_p] = ((1 - damping_factor) / len(corpus)) + prob_p
 
