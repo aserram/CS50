@@ -116,8 +116,11 @@ def iterate_pagerank(corpus, damping_factor):
 
             next_pr[page_p] = ((1 - damping_factor) / len(corpus)) + prob_p
 
+        not_converged = False
         for pr_prev, pr_next in zip(prev_pr.values(), next_pr.values()):
-            not_converged = not_converged & (abs(pr_prev - pr_next) > 0.001)
+            if abs(pr_prev - pr_next) > 0.001:
+                not_converged = True
+                break
 
         prev_pr = dict(next_pr)
     return next_pr
