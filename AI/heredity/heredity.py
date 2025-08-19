@@ -2,6 +2,8 @@ import csv
 import itertools
 import sys
 
+# fmt: off
+
 PROBS = {
 
     # Unconditional probabilities for having gene
@@ -36,6 +38,8 @@ PROBS = {
     "mutation": 0.01
 }
 
+# fmt: on
+
 
 def main():
 
@@ -44,6 +48,7 @@ def main():
         sys.exit("Usage: python heredity.py data.csv")
     people = load_data(sys.argv[1])
 
+    # fmt: off
     # Keep track of gene and trait probabilities for each person
     probabilities = {
         person: {
@@ -60,14 +65,15 @@ def main():
         for person in people
     }
 
+    # fmt: on
+
     # Loop over all sets of people who might have the trait
     names = set(people)
     for have_trait in powerset(names):
 
         # Check if current set of people violates known information
         fails_evidence = any(
-            (people[person]["trait"] is not None and
-             people[person]["trait"] != (person in have_trait))
+            (people[person]["trait"] is not None and people[person]["trait"] != (person in have_trait))
             for person in names
         )
         if fails_evidence:
@@ -94,6 +100,7 @@ def main():
                 print(f"    {value}: {p:.4f}")
 
 
+# fmt: off
 def load_data(filename):
     """
     Load gene and trait data from a file into a dictionary.
@@ -126,6 +133,7 @@ def powerset(s):
             itertools.combinations(s, r) for r in range(len(s) + 1)
         )
     ]
+# fmt: on
 
 
 def joint_probability(people, one_gene, two_genes, have_trait):
@@ -139,7 +147,25 @@ def joint_probability(people, one_gene, two_genes, have_trait):
         * everyone in set `have_trait` has the trait, and
         * everyone not in set` have_trait` does not have the trait.
     """
-    raise NotImplementedError
+    # fmt: off
+    people_states = {
+        person: {
+            "gene": 0 if person not in two_genes | one_gene else (1 if person in one_gene else 2),
+            "trait": True if person in have_trait else False
+            }
+        for person in people
+    }
+    # fmt: on
+
+    probability = 1
+    for name in set(people):
+        state = people_states[name]
+        if people[name]["mother"] and people[name]["father"]:
+            continue
+        else:
+            gene_prob = PROBS["gene"][state["gene"]]
+            trait_prob = PROBS["trait"][state["gene"]][state["trait"]]
+            probability *= gene_prob * trait_prob
 
 
 def update(probabilities, one_gene, two_genes, have_trait, p):
