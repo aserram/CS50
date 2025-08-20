@@ -155,17 +155,29 @@ def joint_probability(people, one_gene, two_genes, have_trait):
             }
         for person in people
     }
-    # fmt: on
 
     probability = 1
     for name in set(people):
         state = people_states[name]
         if people[name]["mother"] and people[name]["father"]:
-            continue
+            trait_prob = PROBS["trait"][state["gene"]][state["trait"]]
+
+            prob_mother = 0.5 * people_states[people[name]["mother"]]["gene"]
+            prob_father = 0.5 * people_states[people[name]["father"]]["gene"]
+            if state["gene"] == 0:
+                gene_prob = abs(1 - prob_mother - PROBS["mutation"]) * abs(1 - prob_father - PROBS["mutation"])
+            elif state["gene"] == 1:
+                gene_prob = abs(prob_mother - PROBS["mutation"]) * abs(1 - prob_father - PROBS["mutation"]) \
+                            + abs(1 - prob_mother - PROBS["mutation"]) * abs(prob_father - PROBS["mutation"])
+            else:
+                gene_prob = abs(prob_mother - PROBS["mutation"]) * abs(prob_father - PROBS["mutation"])
+
         else:
             gene_prob = PROBS["gene"][state["gene"]]
             trait_prob = PROBS["trait"][state["gene"]][state["trait"]]
-            probability *= gene_prob * trait_prob
+
+        probability *= gene_prob * trait_prob
+    # fmt: on
 
 
 def update(probabilities, one_gene, two_genes, have_trait, p):
