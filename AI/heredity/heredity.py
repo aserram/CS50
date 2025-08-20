@@ -177,6 +177,7 @@ def joint_probability(people, one_gene, two_genes, have_trait):
             trait_prob = PROBS["trait"][state["gene"]][state["trait"]]
 
         probability *= gene_prob * trait_prob
+    return probability
     # fmt: on
 
 
@@ -187,7 +188,18 @@ def update(probabilities, one_gene, two_genes, have_trait, p):
     Which value for each distribution is updated depends on whether
     the person is in `have_gene` and `have_trait`, respectively.
     """
-    raise NotImplementedError
+    people_states = {
+        person: {
+            "gene": 0 if person not in two_genes | one_gene else (1 if person in one_gene else 2),
+            "trait": True if person in have_trait else False,
+        }
+        for person in probabilities
+    }
+
+    for name in set(probabilities):
+        state = people_states[name]
+        probabilities[name]["gene"][state["gene"]] += p
+        probabilities[name]["trait"][state["trait"]] += p
 
 
 def normalize(probabilities):
