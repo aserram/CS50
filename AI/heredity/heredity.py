@@ -136,6 +136,16 @@ def powerset(s):
 # fmt: on
 
 
+def inherit_parents(gene_num):
+    if gene_num == 0:
+        prob = PROBS["mutation"]
+    elif gene_num == 1:
+        prob = 0.5
+    else:
+        prob = 1 - PROBS["mutation"]
+    return prob
+
+
 def joint_probability(people, one_gene, two_genes, have_trait):
     """
     Compute and return a joint probability.
@@ -159,22 +169,22 @@ def joint_probability(people, one_gene, two_genes, have_trait):
     probability = 1
     for name in set(people):
         state = people_states[name]
-        if people[name]["mother"] and people[name]["father"]:
-            trait_prob = PROBS["trait"][state["gene"]][state["trait"]]
+        trait_prob = PROBS["trait"][state["gene"]][state["trait"]]
 
-            prob_mother = 0.5 * people_states[people[name]["mother"]]["gene"]
-            prob_father = 0.5 * people_states[people[name]["father"]]["gene"]
+        if people[name]["mother"] and people[name]["father"]:
+
+            prob_mother = inherit_parents(people_states[people[name]["mother"]]["gene"])
+            prob_father = inherit_parents(people_states[people[name]["father"]]["gene"])
+
             if state["gene"] == 0:
-                gene_prob = abs(1 - prob_mother - PROBS["mutation"]) * abs(1 - prob_father - PROBS["mutation"])
+                gene_prob = (1 - prob_mother) * (1 - prob_father)
             elif state["gene"] == 1:
-                gene_prob = abs(prob_mother - PROBS["mutation"]) * abs(1 - prob_father - PROBS["mutation"]) \
-                            + abs(1 - prob_mother - PROBS["mutation"]) * abs(prob_father - PROBS["mutation"])
+                gene_prob = prob_mother * (1 - prob_father) + (1 - prob_mother) * prob_father
             else:
-                gene_prob = abs(prob_mother - PROBS["mutation"]) * abs(prob_father - PROBS["mutation"])
+                gene_prob = prob_mother * prob_father
 
         else:
             gene_prob = PROBS["gene"][state["gene"]]
-            trait_prob = PROBS["trait"][state["gene"]][state["trait"]]
 
         probability *= gene_prob * trait_prob
     return probability
