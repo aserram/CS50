@@ -89,11 +89,8 @@ class CrosswordCreator:
         (Remove any values that are inconsistent with a variable's unary
          constraints; in this case, the length of the word.)
         """
-        domains = deepcopy(self.domains)
-        for var, domain in domains.items():
-            for val in domain:
-                if var.length != len(val):
-                    self.domains[var].remove(val)
+        for var, domain in self.domains.items():
+            self.domains[var] = {val for val in domain if var.length == len(val)}
 
     def revise(self, x, y):
         """
