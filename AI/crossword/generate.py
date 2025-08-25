@@ -182,17 +182,15 @@ class CrosswordCreator:
             count = 0
             for neighbor in self.crossword.neighbors(var):
                 if neighbor not in assignment.keys():
+                    overlap = self.crossword.overlaps[(var, neighbor)]
                     count += sum(
                         1
                         for neighbor_val in self.domains[neighbor]
-                        if value[self.crossword.overlaps[(var, neighbor)][0]]
-                        != neighbor_val[self.crossword.overlaps[(var, neighbor)][1]]
-                        or value == neighbor_val
+                        if value[overlap[0]] != neighbor_val[overlap[1]] or value == neighbor_val
                     )
 
             neighbor_constraints[value] = count
-        ordered_values = sorted(neighbor_constraints, key=neighbor_constraints.get)
-        return ordered_values
+        return sorted(neighbor_constraints, key=neighbor_constraints.get)
 
     def select_unassigned_variable(self, assignment):
         """
@@ -202,11 +200,19 @@ class CrosswordCreator:
         degree. If there is a tie, any of the tied variables are acceptable
         return values.
         """
-        for variable in self.crossword.variables:
-            if variable not in assignment.keys():
-                return variable
+        # for variable in self.crossword.variables:
+        #     if variable not in assignment.keys():
+        #         return variable
 
-        return None
+        # return None
+        domain_len = {}
+        for var, domain in self.domains.items():
+            if var not in assignment.keys():
+                domain_len[var] = len(domain)
+
+        if len(domain_len.values()) == len(set(domain_len.values())):
+            return min(domain_len, key=domain_len.get)
+        return domain_len
 
     def backtrack(self, assignment):
         """
