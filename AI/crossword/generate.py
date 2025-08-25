@@ -81,7 +81,7 @@ class CrosswordCreator:
         Enforce node and arc consistency, and then solve the CSP.
         """
         self.enforce_node_consistency()
-        self.ac3()
+        # self.ac3()
         return self.backtrack(dict())
 
     def enforce_node_consistency(self):
@@ -177,7 +177,22 @@ class CrosswordCreator:
         The first value in the list, for example, should be the one
         that rules out the fewest values among the neighbors of `var`.
         """
-        return self.domains[var]
+        neighbor_constraints = {}
+        for value in self.domains[var]:
+            count = 0
+            for neighbor in self.crossword.neighbors(var):
+                if neighbor not in assignment.keys():
+                    count += sum(
+                        1
+                        for neighbor_val in self.domains[neighbor]
+                        if value[self.crossword.overlaps[(var, neighbor)][0]]
+                        != neighbor_val[self.crossword.overlaps[(var, neighbor)][1]]
+                        or value == neighbor_val
+                    )
+
+            neighbor_constraints[value] = count
+        ordered_values = sorted(neighbor_constraints, key=neighbor_constraints.get)
+        return ordered_values
 
     def select_unassigned_variable(self, assignment):
         """
@@ -188,7 +203,7 @@ class CrosswordCreator:
         return values.
         """
         for variable in self.crossword.variables:
-            if variable not in assignment:
+            if variable not in assignment.keys():
                 return variable
 
         return None
