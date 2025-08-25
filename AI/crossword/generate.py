@@ -1,5 +1,6 @@
 import sys
 import random
+from copy import copy
 
 from crossword import *
 
@@ -201,7 +202,20 @@ class CrosswordCreator:
 
         If no assignment is possible, return None.
         """
-        raise NotImplementedError
+        if self.assignment_complete(assignment):
+            return assignment
+
+        var = self.select_unassigned_variable(assignment)
+
+        for value in self.order_domain_values(var, assignment):
+            new_assignment = copy(assignment)
+            new_assignment[var] = value
+            if self.consistent(new_assignment):
+                result = self.backtrack(new_assignment)
+                if result is not None:
+                    return result
+
+        return None
 
 
 def main():
