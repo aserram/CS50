@@ -81,7 +81,7 @@ class CrosswordCreator:
         Enforce node and arc consistency, and then solve the CSP.
         """
         self.enforce_node_consistency()
-        # self.ac3()
+        self.ac3()
         return self.backtrack(dict())
 
     def enforce_node_consistency(self):
@@ -123,7 +123,7 @@ class CrosswordCreator:
         Return True if arc consistency is enforced and no domains are empty;
         return False if one or more domains end up empty.
         """
-        if arcs:
+        if arcs is not None:
             queue = arcs
         else:
             queue = set(self.crossword.overlaps.keys())
@@ -133,9 +133,8 @@ class CrosswordCreator:
             if self.revise(x, y):
                 if not self.domains[x]:
                     return False
-                for arc in self.crossword.overlaps.keys():
-                    if x == arc[1] and arc[0] != y:
-                        queue.add(arc)
+                for z in self.crossword.neighbors(x) - {y}:
+                    queue.add((z, x))
         return True
 
     def assignment_complete(self, assignment):
