@@ -200,19 +200,26 @@ class CrosswordCreator:
         degree. If there is a tie, any of the tied variables are acceptable
         return values.
         """
-        # for variable in self.crossword.variables:
-        #     if variable not in assignment.keys():
-        #         return variable
-
-        # return None
-        domain_len = {}
+        domain_lengths = {}
         for var, domain in self.domains.items():
             if var not in assignment.keys():
-                domain_len[var] = len(domain)
+                domain_lengths[var] = len(domain)
 
-        if len(domain_len.values()) == len(set(domain_len.values())):
-            return min(domain_len, key=domain_len.get)
-        return domain_len
+        # returns the variable with the unique smallest domain, if it exists
+        if len(domain_lengths.values()) == len(set(domain_lengths.values())):
+            return min(domain_lengths, key=domain_lengths.get)
+
+        # if there are multiple variables with same min domain, return the var with the highest degree
+        min_domain_length = min(domain_lengths.values())
+        min_domain_vars = [var for var, domain_len in domain_lengths.items() if domain_len == min_domain_length]
+
+        max_degree = 0
+        for var in min_domain_vars:
+            curr_degree = len(self.crossword.neighbors(var))
+            if curr_degree > max_degree:
+                max_degree = curr_degree
+                selected_var = var
+        return selected_var
 
     def backtrack(self, assignment):
         """
