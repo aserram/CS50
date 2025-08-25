@@ -1,5 +1,5 @@
 import sys
-from copy import deepcopy
+import random
 
 from crossword import *
 
@@ -101,7 +101,17 @@ class CrosswordCreator:
         Return True if a revision was made to the domain of `x`; return
         False if no revision was made.
         """
-        raise NotImplementedError
+        if self.crossword.overlaps[(x, y)]:
+            original_domain = self.domains[x]
+            overlap = self.crossword.overlaps[(x, y)]
+            self.domains[x] = {
+                val_x
+                for val_x in self.domains[x]
+                if any(val_x[overlap[0]] == val_y[overlap[1]] for val_y in self.domains[y])
+            }
+            return original_domain != self.domains[x]
+
+        return False
 
     def ac3(self, arcs=None):
         """
