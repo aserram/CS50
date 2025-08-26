@@ -1,6 +1,6 @@
 import sys
 import random
-from copy import copy
+from copy import deepcopy
 
 from crossword import *
 
@@ -220,6 +220,14 @@ class CrosswordCreator:
                 selected_var = var
         return selected_var
 
+    def inference(self, var, assignment):
+        for var, domain in assignment.items():
+            if self.domains[var] != {domain}:
+                self.domains[var] = {domain}
+
+        result = self.ac3(arcs={(neighbor, var) for neighbor in self.crossword.neighbors(var)})
+        return result
+
     def backtrack(self, assignment):
         """
         Using Backtracking Search, take as input a partial assignment for the
@@ -232,16 +240,18 @@ class CrosswordCreator:
         if self.assignment_complete(assignment):
             return assignment
 
+        original_domains = deepcopy(self.domains)
         var = self.select_unassigned_variable(assignment)
 
         for value in self.order_domain_values(var, assignment):
-            new_assignment = copy(assignment)
-            new_assignment[var] = value
-            if self.consistent(new_assignment):
-                result = self.backtrack(new_assignment)
+            assignment[var] = value
+            if self.consistent(assignment):
+                self.inference(var, assignment)
+                result = self.backtrack(assignment)
                 if result is not None:
                     return result
-
+            del assignment[var]
+            self.domains = original_domains
         return None
 
 
