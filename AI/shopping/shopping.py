@@ -1,3 +1,4 @@
+from typing import Generator
 import csv
 import sys
 
@@ -15,9 +16,7 @@ def main():
 
     # Load data from spreadsheet and split into train and test sets
     evidence, labels = load_data(sys.argv[1])
-    X_train, X_test, y_train, y_test = train_test_split(
-        evidence, labels, test_size=TEST_SIZE
-    )
+    X_train, X_test, y_train, y_test = train_test_split(evidence, labels, test_size=TEST_SIZE)
 
     # Train model and make predictions
     model = train_model(X_train, y_train)
@@ -29,6 +28,30 @@ def main():
     print(f"Incorrect: {(y_test != predictions).sum()}")
     print(f"True Positive Rate: {100 * sensitivity:.2f}%")
     print(f"True Negative Rate: {100 * specificity:.2f}%")
+
+
+def read_by_row(filename: str, encoding: str = "utf-8") -> Generator[dict[str, str], None, None]:
+    with open(filename, newline="", encoding=encoding) as f:
+        yield from (row for row in csv.DictReader(f))
+
+
+def month_to_int(month: str) -> int:
+    month = month.upper()
+    month_map = {
+        "JAN": 0,
+        "FEB": 1,
+        "MAR": 2,
+        "APR": 3,
+        "MAY": 4,
+        "JUN": 5,
+        "JUL": 6,
+        "AUG": 7,
+        "SEP": 8,
+        "OCT": 9,
+        "NOV": 10,
+        "DEC": 11,
+    }
+    return month_map.get(month)
 
 
 def load_data(filename):
@@ -59,7 +82,48 @@ def load_data(filename):
     labels should be the corresponding list of labels, where each label
     is 1 if Revenue is true, and 0 otherwise.
     """
-    raise NotImplementedError
+    float_evidence = [
+        "Administrative_Duration",
+        "Informational_Duration",
+        "ProductRelated_Duration",
+        "BounceRates",
+        "ExitRates",
+        "PageValues",
+        "SpecialDay",
+    ]
+    int_evidence = [
+        "Administrative",
+        "Informational",
+        "ProductRelated",
+        "OperatingSystems",
+        "Browser",
+        "Region",
+        "TrafficType",
+    ]
+
+    evidence_collection = []
+    label_collection = []
+
+    for row in read_by_row(filename):
+        evidence = []
+        label = []
+        for col, val in row.items():
+            if col in int_evidence:
+                evidence.append(int(val))
+            elif col in float_evidence:
+                evidence.append(float(val))
+            elif col == "Month":
+                evidence.append(month_to_int(val))
+            elif col == "VisitorType":
+                evidence.append(1 if val == "Returning_Visitor" else 0)
+            elif col == "Weekend":
+                evidence.append(0 if val == "FALSE" else 1)
+            else:
+                label.append(0 if val == "FALSE" else 1)
+        evidence_collection.append(evidence)
+        label_collection.append(label)
+
+    return (evidence_collection, label_collection)
 
 
 def train_model(evidence, labels):
