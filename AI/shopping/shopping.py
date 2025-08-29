@@ -43,7 +43,7 @@ def month_to_int(month: str) -> int:
         "MAR": 2,
         "APR": 3,
         "MAY": 4,
-        "JUN": 5,
+        "JUNE": 5,
         "JUL": 6,
         "AUG": 7,
         "SEP": 8,
@@ -106,7 +106,6 @@ def load_data(filename):
 
     for row in read_by_row(filename):
         evidence = []
-        label = []
         for col, val in row.items():
             if col in int_evidence:
                 evidence.append(int(val))
@@ -119,9 +118,8 @@ def load_data(filename):
             elif col == "Weekend":
                 evidence.append(0 if val == "FALSE" else 1)
             else:
-                label.append(0 if val == "FALSE" else 1)
+                label_collection.append(0 if val == "FALSE" else 1)
         evidence_collection.append(evidence)
-        label_collection.append(label)
 
     return (evidence_collection, label_collection)
 
@@ -131,7 +129,7 @@ def train_model(evidence, labels):
     Given a list of evidence lists and a list of labels, return a
     fitted k-nearest neighbor model (k=1) trained on the data.
     """
-    raise NotImplementedError
+    return KNeighborsClassifier(n_neighbors=1).fit(evidence, labels)
 
 
 def evaluate(labels, predictions):
@@ -149,7 +147,26 @@ def evaluate(labels, predictions):
     representing the "true negative rate": the proportion of
     actual negative labels that were accurately identified.
     """
-    raise NotImplementedError
+    total_positive = 0
+    true_positive = 0
+
+    total_negative = 0
+    true_negative = 0
+
+    for label, prediction in zip(labels, predictions):
+        if label:
+            total_positive += 1
+            if prediction:
+                true_positive += 1
+        if not label:
+            total_negative += 1
+            if not prediction:
+                true_negative += 1
+
+    sensitivity = true_positive / total_positive
+    specificity = true_negative / total_negative
+
+    return (sensitivity, specificity)
 
 
 if __name__ == "__main__":
