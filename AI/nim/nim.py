@@ -171,8 +171,6 @@ class NimAI:
         If multiple actions have the same Q-value, any of those
         options is an acceptable return value.
         """
-        max_q = 0
-
         if epsilon:
             if random.choices(population=[1, 0], weights=[(1 - self.epsilon), self.epsilon]) == [1]:
                 best_action = self.best_future_action(state)
