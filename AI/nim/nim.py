@@ -3,7 +3,7 @@ import random
 import time
 
 
-class Nim():
+class Nim:
 
     def __init__(self, initial=[1, 3, 5, 7]):
         """
@@ -70,7 +70,7 @@ class Nim():
             self.winner = self.player
 
 
-class NimAI():
+class NimAI:
 
     def __init__(self, alpha=0.5, epsilon=0.1):
         """
@@ -101,7 +101,10 @@ class NimAI():
         Return the Q-value for the state `state` and the action `action`.
         If no Q-value exists yet in `self.q`, return 0.
         """
-        raise NotImplementedError
+        if (tuple(state), action) in self.q.keys():
+            return self.q[(tuple(state), action)]
+        else:
+            return 0
 
     def update_q_value(self, state, action, old_q, reward, future_rewards):
         """
@@ -118,7 +121,7 @@ class NimAI():
         `alpha` is the learning rate, and `new value estimate`
         is the sum of the current reward and estimated future rewards.
         """
-        raise NotImplementedError
+        self.q[(tuple(state), action)] = old_q + self.alpha * ((reward + future_rewards) - old_q)
 
     def best_future_reward(self, state):
         """
@@ -130,7 +133,28 @@ class NimAI():
         Q-value in `self.q`. If there are no available actions in
         `state`, return 0.
         """
-        raise NotImplementedError
+        max_q = 0
+
+        for key, q in self.q.items():
+            if key[0] == tuple(state):
+                max_q = max(max_q, q)
+
+        return max_q
+
+    def best_future_action(self, state):
+
+        best_action = None
+        max_q = 0
+
+        for state_act, q in self.q.items():
+            if state_act[0] == tuple(state) and q > max_q:
+                max_q = max(max_q, q)
+                best_action = state_act[1]
+
+        if best_action is None:
+            best_action = random.choice(list(Nim.available_actions(state)))
+
+        return best_action
 
     def choose_action(self, state, epsilon=True):
         """
@@ -147,7 +171,17 @@ class NimAI():
         If multiple actions have the same Q-value, any of those
         options is an acceptable return value.
         """
-        raise NotImplementedError
+        max_q = 0
+
+        if epsilon:
+            if random.choices(population=[1, 0], weights=[(1 - self.epsilon), self.epsilon]) == [1]:
+                best_action = self.best_future_action(state)
+            else:
+                best_action = random.choice(list(Nim.available_actions(state)))
+        else:
+            best_action = self.best_future_action(state)
+
+        return best_action
 
 
 def train(n):
@@ -163,10 +197,7 @@ def train(n):
         game = Nim()
 
         # Keep track of last move made by either player
-        last = {
-            0: {"state": None, "action": None},
-            1: {"state": None, "action": None}
-        }
+        last = {0: {"state": None, "action": None}, 1: {"state": None, "action": None}}
 
         # Game loop
         while True:
@@ -186,22 +217,12 @@ def train(n):
             # When game is over, update Q values with rewards
             if game.winner is not None:
                 player.update(state, action, new_state, -1)
-                player.update(
-                    last[game.player]["state"],
-                    last[game.player]["action"],
-                    new_state,
-                    1
-                )
+                player.update(last[game.player]["state"], last[game.player]["action"], new_state, 1)
                 break
 
             # If game is continuing, no rewards yet
             elif last[game.player]["state"] is not None:
-                player.update(
-                    last[game.player]["state"],
-                    last[game.player]["action"],
-                    new_state,
-                    0
-                )
+                player.update(last[game.player]["state"], last[game.player]["action"], new_state, 0)
 
     print("Done training")
 
