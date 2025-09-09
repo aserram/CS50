@@ -101,7 +101,7 @@ def get_model():
     )
 
     # Train neural network
-    model.compile(optimizer="adam", loss="space_categorical_crossentropy", metrics=["accuracy"])
+    model.compile(optimizer="adam", loss="categorical_crossentropy", metrics=["accuracy"])
 
     return model
 
