@@ -24,9 +24,7 @@ def main():
 
     # Split data into training and testing sets
     labels = tf.keras.utils.to_categorical(labels)
-    x_train, x_test, y_train, y_test = train_test_split(
-        np.array(images), np.array(labels), test_size=TEST_SIZE
-    )
+    x_train, x_test, y_train, y_test = train_test_split(np.array(images), np.array(labels), test_size=TEST_SIZE)
 
     # Get a compiled neural network
     model = get_model()
@@ -35,13 +33,23 @@ def main():
     model.fit(x_train, y_train, epochs=EPOCHS)
 
     # Evaluate neural network performance
-    model.evaluate(x_test,  y_test, verbose=2)
+    model.evaluate(x_test, y_test, verbose=2)
 
     # Save model to file
     if len(sys.argv) == 3:
         filename = sys.argv[2]
         model.save(filename)
         print(f"Model saved to {filename}.")
+
+
+def iter_labeled_ppm_files(data_dir):
+    for label in os.listdir(data_dir):
+        label_path = os.path.join(data_dir, label)
+        if os.path.isdir(label_path):
+            for filename in os.listdir(label_path):
+                file_path = os.path.join(label_path, filename)
+                if os.path.isfile(file_path) and filename.endswith(".ppm"):
+                    yield (label, file_path)
 
 
 def load_data(data_dir):
@@ -58,7 +66,14 @@ def load_data(data_dir):
     be a list of integer labels, representing the categories for each of the
     corresponding `images`.
     """
-    raise NotImplementedError
+    images = []
+    labels = []
+
+    for label, image_path in iter_labeled_ppm_files(data_dir):
+        labels.append(label)
+        images.append(cv2.resize(cv2.imread(image_path), (IMG_WIDTH, IMG_HEIGHT)))
+
+    return (images, labels)
 
 
 def get_model():
