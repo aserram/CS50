@@ -90,6 +90,10 @@ def get_model():
             tf.keras.layers.Conv2D(filters=32, kernel_size=(3, 3), activation="relu"),
             # Max-pooling layer, using 2X2 pool size
             tf.keras.layers.MaxPooling2D(pool_size=(2, 2)),
+            # Convolutional layer. Learn 64 (3,3) kernel filters.
+            tf.keras.layers.Conv2D(filters=64, kernel_size=(3, 3), activation="relu"),
+            # Max-pooling layer, using 2X2 pool size
+            tf.keras.layers.MaxPooling2D(pool_size=(2, 2)),
             # Flatten units
             tf.keras.layers.Flatten(),
             # Add a hidden layer with dropout
