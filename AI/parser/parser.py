@@ -1,5 +1,10 @@
 import nltk
+from nltk.tokenize import word_tokenize
 import sys
+
+# Download the Punkt tokenizer model. One-time download.
+nltk.download("punkt")
+nltk.download("punkt_tab")
 
 TERMINALS = """
 Adj -> "country" | "dreadful" | "enigmatical" | "little" | "moist" | "red"
@@ -62,7 +67,12 @@ def preprocess(sentence):
     and removing any word that does not contain at least one alphabetic
     character.
     """
-    raise NotImplementedError
+    words = []
+    for word in word_tokenize(sentence):
+        if word.isalpha():
+            words.append(word.lower())
+
+    return words
 
 
 def np_chunk(tree):
