@@ -3,8 +3,8 @@ from nltk.tokenize import word_tokenize
 import sys
 
 # Download the Punkt tokenizer model. One-time download.
-nltk.download("punkt")
-nltk.download("punkt_tab")
+# nltk.download("punkt")
+# nltk.download("punkt_tab")
 
 TERMINALS = """
 Adj -> "country" | "dreadful" | "enigmatical" | "little" | "moist" | "red"
@@ -22,8 +22,8 @@ V -> "smiled" | "tell" | "were"
 NONTERMINALS = """
 S -> NP VP
 
-AP -> A  | A AP
-NP -> N | D N | D NP | AP NP | N PP
+AP -> Adj | Adj AP
+NP -> N | Det NP | AP NP | N PP
 PP -> P NP
 VP -> V | V NP | V PP | V NP PP
 """
@@ -60,9 +60,9 @@ def main():
     for tree in trees:
         tree.pretty_print()
 
-        print("Noun Phrase Chunks")
-        for np in np_chunk(tree):
-            print(" ".join(np.flatten()))
+        # print("Noun Phrase Chunks")
+        # for np in np_chunk(tree):
+        #     print(" ".join(np.flatten()))
 
 
 def preprocess(sentence):
