@@ -60,9 +60,9 @@ def main():
     for tree in trees:
         tree.pretty_print()
 
-        # print("Noun Phrase Chunks")
-        # for np in np_chunk(tree):
-        #     print(" ".join(np.flatten()))
+        print("Noun Phrase Chunks")
+        for np in np_chunk(tree):
+            print(" ".join(np.flatten()))
 
 
 def preprocess(sentence):
@@ -80,14 +80,25 @@ def preprocess(sentence):
     return words
 
 
-def np_chunk(tree):
+def contains_sub_np(tree: nltk.Tree) -> bool:
+    for subtree in tree:
+        if subtree.label() == "NP" and subtree.height() > 3:
+            return True
+    return False
+
+
+def np_chunk(tree: nltk.Tree) -> nltk.Tree:
     """
     Return a list of all noun phrase chunks in the sentence tree.
     A noun phrase chunk is defined as any subtree of the sentence
     whose label is "NP" that does not itself contain any other
     noun phrases as subtrees.
     """
-    raise NotImplementedError
+    np_tree = nltk.tree.Tree("S", [])
+    for subtree in tree.subtrees(lambda t: t.label() == "NP"):
+        if not contains_sub_np(subtree):
+            np_tree.append(subtree)
+    return np_tree
 
 
 if __name__ == "__main__":
