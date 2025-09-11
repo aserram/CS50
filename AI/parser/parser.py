@@ -23,7 +23,7 @@ NONTERMINALS = """
 S -> NP VP | VP | S Conj S
 
 AP -> Adj | Adj AP
-NP -> N | Det NP | AP NP | N PP
+NP -> N | Det N | Det AP | Det N PP | Det AP NP | AP NP | N PP
 PP -> P NP
 VP -> V | V NP | V PP | V NP PP | Adv VP | VP Adv
 """
@@ -82,7 +82,7 @@ def preprocess(sentence):
 
 def contains_sub_np(tree: nltk.Tree) -> bool:
     for subtree in list(tree.subtrees())[1:]:
-        if subtree.label() == "NP" and subtree.height() > 3:
+        if subtree.label() == "NP" and (subtree.height() > 3 or len(subtree) > 1):
             return True
     return False
 
