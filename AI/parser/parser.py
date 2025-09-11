@@ -81,13 +81,13 @@ def preprocess(sentence):
 
 
 def contains_sub_np(tree: nltk.Tree) -> bool:
-    for subtree in tree:
+    for subtree in list(tree.subtrees())[1:]:
         if subtree.label() == "NP" and subtree.height() > 3:
             return True
     return False
 
 
-def np_chunk(tree: nltk.Tree) -> nltk.Tree:
+def np_chunk(tree):
     """
     Return a list of all noun phrase chunks in the sentence tree.
     A noun phrase chunk is defined as any subtree of the sentence
